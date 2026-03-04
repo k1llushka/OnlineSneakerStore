@@ -23,7 +23,7 @@
 1. Клонируйте репозиторий или скопируйте файлы проекта:
 
 ```bash
-git clone <URL_ВАШЕГО_РЕПОЗИТОРИЯ>
+git clone https://github.com/k1llushka/OnlineSneakerStore.git
 cd OnlineSneakerStore
 ```
 
