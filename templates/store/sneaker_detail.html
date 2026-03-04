@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ sneaker.name }}{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+    <div class="product-gallery">
+        {% if sneaker.main_image %}
+            <img id="product-main-img" src="{{ sneaker.main_image.url }}" alt="{{ sneaker.name }}" class="product-main-image">
+        {% elif sneaker.additional_image_1 %}
+            <img id="product-main-img" src="{{ sneaker.additional_image_1.url }}" alt="{{ sneaker.name }}" class="product-main-image">
+        {% elif sneaker.additional_image_2 %}
+            <img id="product-main-img" src="{{ sneaker.additional_image_2.url }}" alt="{{ sneaker.name }}" class="product-main-image">
+        {% else %}
+            <img id="product-main-img" src="{% static 'img/placeholder.png' %}" alt="{{ sneaker.name }}" class="product-main-image">
+        {% endif %}
+        <div class="product-thumbs" id="product-thumbs">
+            {% if sneaker.main_image %}
+                <img src="{{ sneaker.main_image.url }}" alt="" class="thumb active" data-src="{{ sneaker.main_image.url }}">
+            {% endif %}
+            {% if sneaker.additional_image_1 %}
+                <img src="{{ sneaker.additional_image_1.url }}" alt="" class="thumb{% if not sneaker.main_image %} active{% endif %}" data-src="{{ sneaker.additional_image_1.url }}">
+            {% endif %}
+            {% if sneaker.additional_image_2 %}
+                <img src="{{ sneaker.additional_image_2.url }}" alt="" class="thumb{% if not sneaker.main_image and not sneaker.additional_image_1 %} active{% endif %}" data-src="{{ sneaker.additional_image_2.url }}">
+            {% endif %}
+        </div>
+    </div>
+    <div class="product-info">
+        <h1>{{ sneaker.name }}</h1>
+        <p class="price">{{ sneaker.price }} ₽</p>
+        <p>{{ sneaker.description }}</p>
+
+        <form action="{% url 'add_to_cart' sneaker.pk %}" method="post" class="product-form">
+            {% csrf_token %}
+            {% if available_sizes %}
+                <label for="size">Размер:</label>
+                <select name="size" id="size">
+                    {% for size in available_sizes %}
+                        <option value="{{ size }}">{{ size }}</option>
+                    {% endfor %}
+                </select>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">Добавить в корзину</button>
+        </form>
+    </div>
+</div>
+<script>
+document.querySelectorAll('#product-thumbs .thumb').forEach(function(thumb) {
+    thumb.addEventListener('click', function() {
+        var main = document.getElementById('product-main-img');
+        if (main && this.dataset.src) {
+            main.src = this.dataset.src;
+            document.querySelectorAll('#product-thumbs .thumb').forEach(function(t) { t.classList.remove('active'); });
+            this.classList.add('active');
+        }
+    });
+});
+</script>
+{% endblock %}
+

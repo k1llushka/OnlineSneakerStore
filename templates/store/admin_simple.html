@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Простая админка{% endblock %}
+
+{% block content %}
+<h1>Простая админка</h1>
+
+<section class="admin-section">
+    <h2>Добавить товар</h2>
+    <form method="post" enctype="multipart/form-data" class="form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create">
+
+        <label>Название</label>
+        <input type="text" name="name" required>
+
+        <label>Цена (₽)</label>
+        <input type="number" step="0.01" name="price" required>
+
+        <label>Описание</label>
+        <textarea name="description" rows="3"></textarea>
+
+        <label>Размеры (через запятую)</label>
+        <input type="text" name="sizes" placeholder="40, 41, 42">
+
+        <label>Изображение</label>
+        <input type="file" name="main_image" accept="image/*">
+
+        <button type="submit" class="btn btn-primary">Создать</button>
+    </form>
+</section>
+
+<section class="admin-section">
+    <h2>Список товаров</h2>
+    {% if sneakers %}
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Фото</th>
+                <th>Название</th>
+                <th>Цена</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for sneaker in sneakers %}
+                <tr>
+                    <td>{{ sneaker.id }}</td>
+                    <td>
+                        {% if sneaker.main_image %}
+                            <img src="{{ sneaker.main_image.url }}" alt="" class="admin-thumb">
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>{{ sneaker.name }}</td>
+                    <td>{{ sneaker.price }} ₽</td>
+                    <td>
+                        <a href="{% url 'admin_sneaker_edit' sneaker.pk %}" class="btn">Фото</a>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="sneaker_id" value="{{ sneaker.id }}">
+                            <button type="submit" class="btn btn-secondary">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Товаров пока нет.</p>
+    {% endif %}
+</section>
+{% endblock %}
+

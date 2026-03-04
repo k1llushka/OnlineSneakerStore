@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Каталог кроссовок{% endblock %}
+
+{% block content %}
+<h1>Каталог кроссовок</h1>
+<div class="grid">
+    {% for sneaker in sneakers %}
+        <div class="card">
+            <a href="{% url 'sneaker_detail' sneaker.pk %}">
+                {% if sneaker.main_image %}
+                    <img src="{{ sneaker.main_image.url }}" alt="{{ sneaker.name }}">
+                {% else %}
+                    <img src="{% static 'img/placeholder.png' %}" alt="{{ sneaker.name }}">
+                {% endif %}
+                <h2>{{ sneaker.name }}</h2>
+            </a>
+            <p class="price">{{ sneaker.price }} ₽</p>
+            <form action="{% url 'add_to_cart' sneaker.pk %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn">Добавить в корзину</button>
+            </form>
+        </div>
+    {% empty %}
+        <p>Пока нет товаров. Добавьте их через простую админку.</p>
+    {% endfor %}
+</div>
+{% endblock %}
+

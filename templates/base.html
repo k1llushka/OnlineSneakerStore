@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Sneaker Store{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+<header class="header">
+    <div class="container header__inner">
+        <a href="{% url 'home' %}" class="logo">SneakerStore</a>
+        <nav class="nav">
+            <a href="{% url 'home' %}">Каталог</a>
+            <a href="{% url 'cart' %}">Корзина ({{ cart_items_count }})</a>
+        </nav>
+    </div>
+</header>
+<main class="main">
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+<footer class="footer">
+    <div class="container">
+        <p>Простой учебный интернет-магазин кроссовок</p>
+    </div>
+</footer>
+</body>
+</html>
+

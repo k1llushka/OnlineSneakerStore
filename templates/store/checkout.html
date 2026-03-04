@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Оформление заказа{% endblock %}
+
+{% block content %}
+<h1>Оформление заказа</h1>
+
+{% if error %}
+    <p class="error">{{ error }}</p>
+{% endif %}
+
+<form method="post" class="form">
+    {% csrf_token %}
+    <label>Имя</label>
+    <input type="text" name="name" required>
+
+    <label>Телефон</label>
+    <input type="text" name="phone" required>
+
+    <label>Адрес</label>
+    <textarea name="address" rows="3" required></textarea>
+
+    <button type="submit" class="btn btn-primary">Оформить заказ</button>
+</form>
+{% endblock %}
+
