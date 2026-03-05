@@ -1,30 +1,102 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Каталог кроссовок{% endblock %}
+{% block title %}Современный магазин кроссовок{% endblock %}
 
 {% block content %}
-<h1>Каталог кроссовок</h1>
-<div class="grid">
-    {% for sneaker in sneakers %}
-        <div class="card">
-            <a href="{% url 'sneaker_detail' sneaker.pk %}">
-                {% if sneaker.main_image %}
-                    <img src="{{ sneaker.main_image.url }}" alt="{{ sneaker.name }}">
-                {% else %}
-                    <img src="{% static 'img/placeholder.png' %}" alt="{{ sneaker.name }}">
-                {% endif %}
-                <h2>{{ sneaker.name }}</h2>
-            </a>
-            <p class="price">{{ sneaker.price }} ₽</p>
-            <form action="{% url 'add_to_cart' sneaker.pk %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn">Добавить в корзину</button>
-            </form>
+<section class="hero fade-in-up">
+    <div class="hero-content">
+        <h1>Современные кроссовки для тех, кто в потоке.</h1>
+        <p>Подберите пару, которая подходит вашему ритму жизни. Минималистичный интерфейс, быстрая корзина и простое оформление заказа.</p>
+        <div class="hero-actions">
+            <a href="#catalog" class="btn btn-primary">Перейти в каталог</a>
+            <a href="{% url 'about' %}" class="btn btn-ghost">Узнать больше</a>
         </div>
-    {% empty %}
-        <p>Пока нет товаров. Добавьте их через простую админку.</p>
-    {% endfor %}
-</div>
+        <div class="hero-highlights">
+            <div class="hero-pill">
+                <span class="hero-icon">
+                    <svg class="icon"><use href="#icon-bolt"></use></svg>
+                </span>
+                Быстрое оформление заказа
+            </div>
+            <div class="hero-pill">
+                <span class="hero-icon">
+                    <svg class="icon"><use href="#icon-shield"></use></svg>
+                </span>
+                Безопасная обработка данных
+            </div>
+            <div class="hero-pill">
+                <span class="hero-icon">
+                    <svg class="icon"><use href="#icon-truck"></use></svg>
+                </span>
+                Условная доставка по России
+            </div>
+        </div>
+    </div>
+    <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=900&q=80" alt="Sneaker hero" loading="lazy">
+    </div>
+</section>
+
+<section class="features fade-in-up">
+    <div class="features-grid">
+        <article class="feature-card">
+            <div class="feature-icon">
+                <svg class="icon"><use href="#icon-target"></use></svg>
+            </div>
+            <h3>Фокус на простоте</h3>
+            <p>Интерфейс без лишнего шума — только ключевые действия и понятные кнопки.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon">
+                <svg class="icon"><use href="#icon-card"></use></svg>
+            </div>
+            <h3>Учебный проект</h3>
+            <p>Идеальная база для обучения Django и современному фронтенду.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon">
+                <svg class="icon"><use href="#icon-box"></use></svg>
+            </div>
+            <h3>Структурированный код</h3>
+            <p>Чёткое разделение на каталог, корзину, оформление и админку.</p>
+        </article>
+        <article class="feature-card">
+            <div class="feature-icon">
+                <svg class="icon"><use href="#icon-chart"></use></svg>
+            </div>
+            <h3>Панель заказов</h3>
+            <p>Простая клиентская админка для управления заказами без входа в Django Admin.</p>
+        </article>
+    </div>
+</section>
+
+<section id="catalog" class="catalog fade-in-up">
+    <div class="section-header">
+        <h2>Каталог кроссовок</h2>
+        <p>Выберите модель, добавьте в корзину и оформите заказ в пару кликов.</p>
+    </div>
+    <div class="grid">
+        {% for sneaker in sneakers %}
+            <div class="card card--product">
+                <a href="{% url 'sneaker_detail' sneaker.pk %}">
+                    {% if sneaker.main_image %}
+                        <img src="{{ sneaker.main_image.url }}" alt="{{ sneaker.name }}">
+                    {% else %}
+                        <img src="{% static 'img/placeholder.png' %}" alt="{{ sneaker.name }}">
+                    {% endif %}
+                    <h2>{{ sneaker.name }}</h2>
+                </a>
+                <p class="price">{{ sneaker.price }} ₽</p>
+                <form action="{% url 'add_to_cart' sneaker.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Добавить в корзину</button>
+                </form>
+            </div>
+        {% empty %}
+            <p>Пока нет товаров. Добавьте их через админку.</p>
+        {% endfor %}
+    </div>
+</section>
 {% endblock %}
 

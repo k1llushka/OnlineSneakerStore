@@ -1,0 +1,62 @@
+{% extends "client_admin/base_admin.html" %}
+
+{% block title %}Dashboard — панель клиента{% endblock %}
+{% block admin_page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="admin-cards-row">
+    <article class="stat-card">
+        <div class="stat-card__label">Всего заказов</div>
+        <div class="stat-card__value">{{ total_orders }}</div>
+    </article>
+    <article class="stat-card">
+        <div class="stat-card__label">Сумма заказов</div>
+        <div class="stat-card__value">{{ total_amount }} ₽</div>
+    </article>
+    <article class="stat-card">
+        <div class="stat-card__label">Новые</div>
+        <div class="stat-card__value">{{ status_counts.new|default:0 }}</div>
+    </article>
+    <article class="stat-card">
+        <div class="stat-card__label">В обработке</div>
+        <div class="stat-card__value">{{ status_counts.processing|default:0 }}</div>
+    </article>
+</section>
+
+<section class="admin-section">
+    <div class="admin-section__header">
+        <h2>Последние заказы</h2>
+    </div>
+    <div class="table-wrapper">
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Клиент</th>
+                <th>Телефон</th>
+                <th>Статус</th>
+                <th>Сумма</th>
+                <th>Дата</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for order in latest_orders %}
+                <tr>
+                    <td><a href="{% url 'dashboard_order_detail' order.pk %}">#{{ order.id }}</a></td>
+                    <td>{{ order.customer_name }}</td>
+                    <td>{{ order.phone }}</td>
+                    <td>{{ order.get_status_display }}</td>
+                    <td>{{ order.total_amount }} ₽</td>
+                    <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">Заказов пока нет.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+

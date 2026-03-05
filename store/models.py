@@ -5,6 +5,7 @@ class Sneaker(models.Model):
     name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True)
+    category = models.CharField(max_length=100, blank=True)
     main_image = models.ImageField(upload_to="sneakers/", blank=True, null=True)
     additional_image_1 = models.ImageField(upload_to="sneakers/", blank=True, null=True)
     additional_image_2 = models.ImageField(upload_to="sneakers/", blank=True, null=True)
@@ -19,9 +20,26 @@ class Sneaker(models.Model):
 
 
 class Order(models.Model):
+    STATUS_NEW = "new"
+    STATUS_PROCESSING = "processing"
+    STATUS_SHIPPED = "shipped"
+    STATUS_DELIVERED = "delivered"
+
+    STATUS_CHOICES = [
+        (STATUS_NEW, "Новый"),
+        (STATUS_PROCESSING, "В обработке"),
+        (STATUS_SHIPPED, "Отправлен"),
+        (STATUS_DELIVERED, "Доставлен"),
+    ]
+
     customer_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=50)
     address = models.CharField(max_length=500)
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_NEW,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
