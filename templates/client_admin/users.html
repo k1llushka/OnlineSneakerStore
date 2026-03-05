@@ -1,0 +1,47 @@
+{% extends "client_admin/base_admin.html" %}
+
+{% block title %}Пользователи — Admin{% endblock %}
+{% block admin_page_title %}Пользователи{% endblock %}
+
+{% block content %}
+<section class="admin-section">
+    <div class="admin-section__header">
+        <h2>Клиенты с заказами</h2>
+    </div>
+
+    <div class="table-wrapper">
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>Пользователь</th>
+                <th>Имя клиента</th>
+                <th>Телефон</th>
+                <th>Заказов</th>
+                <th>Общая сумма</th>
+                <th>Последний заказ</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in users %}
+                <tr>
+                    <td>
+                        <div><strong>{{ row.user.username }}</strong></div>
+                        <div class="muted">{{ row.user.email|default:"—" }}</div>
+                    </td>
+                    <td>{{ row.customer_name|default:"—" }}</td>
+                    <td>{{ row.phone|default:"—" }}</td>
+                    <td>{{ row.orders_count }}</td>
+                    <td>{{ row.total_amount }} ₽</td>
+                    <td>{{ row.last_order_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6">Пользователей с заказами пока нет.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+

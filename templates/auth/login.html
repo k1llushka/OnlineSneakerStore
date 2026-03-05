@@ -1,12 +1,12 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
-{% block title %}Вход в панель — SneakerStore{% endblock %}
+{% block title %}Вход в аккаунт — SneakerStore{% endblock %}
 
 {% block content %}
 <div class="login-wrapper fade-in-up">
     <div class="login-card">
-        <h1>Вход в панель</h1>
-        <p class="login-subtitle">Используйте учётные данные Django-суперпользователя.</p>
+        <h1>Вход</h1>
+        <p class="login-subtitle">Введите логин и пароль для входа.</p>
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
@@ -14,23 +14,19 @@
             {% csrf_token %}
             <label for="id_username">Логин</label>
             <div class="input-with-icon">
-                <span class="input-icon">
-                    <svg class="icon"><use href="#icon-user"></use></svg>
-                </span>
+                <span class="input-icon"><svg class="icon"><use href="#icon-user"></use></svg></span>
                 <input id="id_username" type="text" name="username" required autocomplete="username">
             </div>
 
             <label for="id_password">Пароль</label>
             <div class="input-with-icon">
-                <span class="input-icon">
-                    <svg class="icon"><use href="#icon-shield"></use></svg>
-                </span>
+                <span class="input-icon"><svg class="icon"><use href="#icon-shield"></use></svg></span>
                 <input id="id_password" type="password" name="password" required autocomplete="current-password">
             </div>
 
             <button type="submit" class="btn btn-primary login-submit">Войти</button>
         </form>
+        <p class="form-note">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
     </div>
 </div>
 {% endblock %}
-

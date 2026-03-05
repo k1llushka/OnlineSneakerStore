@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load static %}
 
 {% block title %}О магазине — SneakerStore{% endblock %}
@@ -7,59 +7,51 @@
 <section class="about-hero fade-in-up">
     <div class="about-hero-text">
         <h1>О SneakerStore</h1>
-        <p>Учебный интернет-магазин кроссовок с акцентом на чистую архитектуру, современный UI и понятный опыт пользователя.</p>
-    </div>
-    <div class="about-hero-image">
-        <img src="https://images.unsplash.com/photo-1528701800489-20be3c30c1d5?auto=format&fit=crop&w=900&q=80" alt="Коллекция кроссовок" loading="lazy">
-    </div>
-</section>
+        <p>Учебный интернет-магазин кроссовок с акцентом на чистую архитектуру, современный UI и понятный пользовательский опыт.</p>
+    </div>`r`n</section>
 
 <section class="about-section fade-in-up">
     <h2>О магазине</h2>
-    <p>Проект создан как учебная площадка для отработки навыков Django и современного фронтенда. Здесь собраны базовые модули любого интернет-магазина: каталог товаров, корзина, оформление заказа и клиентская админка.</p>
+    <p>Проект создан как учебная площадка для практики Django и современного frontend. Здесь реализованы основные модули e-commerce: каталог, карточка товара, корзина, оформление заказа и панель управления.</p>
 </section>
 
 <section class="about-section fade-in-up">
     <h2>Преимущества</h2>
     <div class="features-grid">
         <article class="feature-card">
-            <div class="feature-icon">
-                <svg class="icon"><use href="#icon-target"></use></svg>
-            </div>
+            <div class="feature-icon"><svg class="icon"><use href="#icon-target"></use></svg></div>
             <h3>Фокус на UX</h3>
             <p>Минималистичный интерфейс с акцентом на ключевые действия пользователя.</p>
         </article>
         <article class="feature-card">
-            <div class="feature-icon">
-                <svg class="icon"><use href="#icon-card"></use></svg>
-            </div>
+            <div class="feature-icon"><svg class="icon"><use href="#icon-card"></use></svg></div>
             <h3>Прозрачная архитектура</h3>
-            <p>Разделение слоёв: представления, модели, шаблоны, клиентская админка.</p>
+            <p>Разделение слоев: модели, views, шаблоны и интерфейс админ-панели.</p>
         </article>
         <article class="feature-card">
-            <div class="feature-icon">
-                <svg class="icon"><use href="#icon-box"></use></svg>
-            </div>
+            <div class="feature-icon"><svg class="icon"><use href="#icon-box"></use></svg></div>
             <h3>Расширяемость</h3>
-            <p>Модели и шаблоны легко дополнять реальными интеграциями и логикой.</p>
+            <p>Проект легко дополнять новыми интеграциями и бизнес-логикой.</p>
         </article>
-    </div>
-</section>
-
-<section class="about-gallery fade-in-up">
-    <h2>Галерея</h2>
-    <div class="about-gallery-grid">
-        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Кроссовки 1" loading="lazy">
-        <img src="https://images.unsplash.com/photo-1528701800484-726a043fcd3a?auto=format&fit=crop&w=600&q=80" alt="Кроссовки 2" loading="lazy">
-        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80" alt="Кроссовки 3" loading="lazy">
     </div>
 </section>
 
 <section class="about-section fade-in-up">
-    <h2>Контакты</h2>
-    <p><strong>Email:</strong> info@sneakerstore.local</p>
-    <p><strong>Телефон:</strong> +7 (999) 000-11-22</p>
-    <p><strong>Адрес:</strong> г. Пример, улица Учебная, дом 1</p>
+    <h2>Отзывы</h2>
+    <div class="reviews-grid">
+        <article class="review-card">
+            <p>«Заказ пришел быстро, кроссовки полностью соответствуют фото. Очень удобный интерфейс оформления.»</p>
+            <div class="review-author">Алина, Москва</div>
+        </article>
+        <article class="review-card">
+            <p>«Понравился выбор размеров и понятная карточка товара. Добавил в корзину и оформил за минуту.»</p>
+            <div class="review-author">Руслан, Казань</div>
+        </article>
+        <article class="review-card">
+            <p>«Отличный минималистичный дизайн, ничего лишнего. Видно, что проект сделан аккуратно.»</p>
+            <div class="review-author">Екатерина, Санкт-Петербург</div>
+        </article>
+    </div>
 </section>
 {% endblock %}
 

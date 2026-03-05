@@ -1,13 +1,13 @@
-{% extends "client_admin/base_admin.html" %}
+﻿{% extends "client_admin/base_admin.html" %}
 
-{% block title %}Заказ #{{ order.id }} — панель клиента{% endblock %}
+{% block title %}Заказ #{{ order.id }} — Admin{% endblock %}
 {% block admin_page_title %}Заказ #{{ order.id }}{% endblock %}
 
 {% block content %}
 <section class="admin-section">
     <div class="admin-section__header">
         <h2>Информация о заказе</h2>
-        <form method="post" style="display: flex; gap: 8px; align-items: center;">
+        <form method="post" style="display:flex; gap:8px; align-items:center;">
             {% csrf_token %}
             <select name="status" class="admin-input">
                 {% for value, label in order.STATUS_CHOICES %}
@@ -17,6 +17,7 @@
             <button type="submit" class="btn btn-primary">Обновить статус</button>
         </form>
     </div>
+
     <div class="admin-order-layout">
         <div class="admin-order-card">
             <h3>Клиент</h3>
@@ -25,6 +26,7 @@
             <p><strong>Адрес:</strong> {{ order.address }}</p>
             <p><strong>Дата:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
         </div>
+
         <div class="admin-order-card">
             <h3>Состав заказа</h3>
             <ul class="order-items-list">
@@ -41,19 +43,18 @@
                     <li>Товары не найдены.</li>
                 {% endfor %}
             </ul>
-            <div class="admin-order-total">
-                Итого: <strong>{{ order.total_amount }} ₽</strong>
-            </div>
+            <div class="admin-order-total">Итого: <strong>{{ order.total_amount }} ₽</strong></div>
         </div>
     </div>
-    <form method="post" onsubmit="return confirm('Удалить этот заказ? Это действие нельзя отменить.');">
+
+    <form method="post" onsubmit="return confirm('Удалить этот заказ? Действие необратимо.');">
         {% csrf_token %}
         <input type="hidden" name="delete" value="1">
         <button type="submit" class="btn btn-secondary">Удалить заказ</button>
     </form>
+
     <p style="margin-top: 16px;">
-        <a href="{% url 'client_admin_orders' %}">← Назад к списку заказов</a>
+        <a href="{% url 'dashboard_orders' %}">← Назад к списку заказов</a>
     </p>
 </section>
 {% endblock %}
-

@@ -1,26 +1,58 @@
-{% extends "client_admin/base_admin.html" %}
+﻿{% extends "client_admin/base_admin.html" %}
 
-{% block title %}Dashboard — панель клиента{% endblock %}
+{% block title %}Dashboard — Admin{% endblock %}
 {% block admin_page_title %}Dashboard{% endblock %}
 
 {% block content %}
 <section class="admin-cards-row">
     <article class="stat-card">
-        <div class="stat-card__label">Всего заказов</div>
+        <div class="stat-card__label">Количество заказов</div>
         <div class="stat-card__value">{{ total_orders }}</div>
     </article>
     <article class="stat-card">
-        <div class="stat-card__label">Сумма заказов</div>
+        <div class="stat-card__label">Количество товаров</div>
+        <div class="stat-card__value">{{ products_count }}</div>
+    </article>
+    <article class="stat-card">
+        <div class="stat-card__label">Новые заказы</div>
+        <div class="stat-card__value">{{ new_orders_count }}</div>
+    </article>
+    <article class="stat-card">
+        <div class="stat-card__label">Оборот</div>
         <div class="stat-card__value">{{ total_amount }} ₽</div>
     </article>
-    <article class="stat-card">
-        <div class="stat-card__label">Новые</div>
-        <div class="stat-card__value">{{ status_counts.new|default:0 }}</div>
-    </article>
-    <article class="stat-card">
-        <div class="stat-card__label">В обработке</div>
-        <div class="stat-card__value">{{ status_counts.processing|default:0 }}</div>
-    </article>
+</section>
+
+<section class="admin-section">
+    <div class="admin-section__header">
+        <h2>Последние покупки</h2>
+    </div>
+    <div class="table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Заказ</th>
+                    <th>Товар</th>
+                    <th>Кол-во</th>
+                    <th>Сумма</th>
+                    <th>Дата</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in latest_purchases %}
+                <tr>
+                    <td>#{{ item.order.id }}</td>
+                    <td>{{ item.sneaker.name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.subtotal }} ₽</td>
+                    <td>{{ item.order.created_at|date:"d.m.Y H:i" }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5">Покупок пока нет.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </section>
 
 <section class="admin-section">
@@ -50,13 +82,10 @@
                     <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
                 </tr>
             {% empty %}
-                <tr>
-                    <td colspan="6">Заказов пока нет.</td>
-                </tr>
+                <tr><td colspan="6">Заказов пока нет.</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 </section>
 {% endblock %}
-

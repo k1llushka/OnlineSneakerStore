@@ -1,6 +1,6 @@
-{% extends "client_admin/base_admin.html" %}
+﻿{% extends "client_admin/base_admin.html" %}
 
-{% block title %}Заказы — панель клиента{% endblock %}
+{% block title %}Заказы — Admin{% endblock %}
 {% block admin_page_title %}Заказы{% endblock %}
 
 {% block content %}
@@ -16,18 +16,27 @@
                 <option value="shipped" {% if status_filter == "shipped" %}selected{% endif %}>Отправлен</option>
                 <option value="delivered" {% if status_filter == "delivered" %}selected{% endif %}>Доставлен</option>
             </select>
-            <button type="submit" class="btn btn-primary">Фильтровать</button>
+            <select name="sort" class="admin-input">
+                <option value="-created_at" {% if sort == "-created_at" %}selected{% endif %}>Сначала новые</option>
+                <option value="created_at" {% if sort == "created_at" %}selected{% endif %}>Сначала старые</option>
+                <option value="customer_name" {% if sort == "customer_name" %}selected{% endif %}>Клиент А-Я</option>
+                <option value="-customer_name" {% if sort == "-customer_name" %}selected{% endif %}>Клиент Я-А</option>
+                <option value="status" {% if sort == "status" %}selected{% endif %}>Статус А-Я</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Применить</button>
         </form>
     </div>
+
     <div class="table-wrapper">
         <table class="admin-table">
             <thead>
             <tr>
-                <th>#</th>
+                <th>№</th>
                 <th>Клиент</th>
                 <th>Телефон</th>
-                <th>Статус</th>
+                <th>Товары</th>
                 <th>Сумма</th>
+                <th>Статус</th>
                 <th>Дата</th>
                 <th></th>
             </tr>
@@ -38,8 +47,17 @@
                     <td>#{{ order.id }}</td>
                     <td>{{ order.customer_name }}</td>
                     <td>{{ order.phone }}</td>
-                    <td>{{ order.get_status_display }}</td>
+                    <td>
+                        <div class="admin-order-products">
+                            {% for item in order.items.all %}
+                                <span>{{ item.sneaker.name }} × {{ item.quantity }}</span>
+                            {% empty %}
+                                <span>—</span>
+                            {% endfor %}
+                        </div>
+                    </td>
                     <td>{{ order.total_amount }} ₽</td>
+                    <td>{{ order.get_status_display }}</td>
                     <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
                     <td>
                         <a href="{% url 'dashboard_order_detail' order.pk %}" class="btn">
@@ -48,13 +66,10 @@
                     </td>
                 </tr>
             {% empty %}
-                <tr>
-                    <td colspan="7">Заказов не найдено.</td>
-                </tr>
+                <tr><td colspan="8">Заказы не найдены.</td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 </section>
 {% endblock %}
-

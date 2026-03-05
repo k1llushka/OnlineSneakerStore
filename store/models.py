@@ -1,4 +1,8 @@
+﻿from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_save
+from django.db.utils import OperationalError, ProgrammingError
+from django.dispatch import receiver
 
 
 class Sneaker(models.Model):
@@ -40,6 +44,13 @@ class Order(models.Model):
         choices=STATUS_CHOICES,
         default=STATUS_NEW,
     )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="store_orders",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
@@ -51,9 +62,7 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(
-        Order, on_delete=models.CASCADE, related_name="items"
-    )
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     size = models.CharField(max_length=10, blank=True)
@@ -62,3 +71,33 @@ class OrderItem(models.Model):
     def subtotal(self):
         return self.quantity * self.sneaker.price
 
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile",
+    )
+    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
+
+    def __str__(self):
+        return f"Профиль {self.user.username}"
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        try:
+            UserProfile.objects.create(user=instance)
+        except (OperationalError, ProgrammingError):
+            return
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def save_user_profile(sender, instance, **kwargs):
+    try:
+        profile, _ = UserProfile.objects.get_or_create(user=instance)
+        profile.save()
+    except (OperationalError, ProgrammingError):
+        # UserProfile table may not exist until migrations are applied.
+        return

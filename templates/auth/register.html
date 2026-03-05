@@ -1,0 +1,45 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Регистрация — SneakerStore{% endblock %}
+
+{% block content %}
+<div class="login-wrapper fade-in-up">
+    <div class="login-card">
+        <h1>Регистрация</h1>
+        <p class="login-subtitle">Создайте аккаунт для оформления заказов.</p>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <form method="post" class="login-form">
+            {% csrf_token %}
+            <label for="id_name">Имя</label>
+            <div class="input-with-icon">
+                <span class="input-icon"><svg class="icon"><use href="#icon-user"></use></svg></span>
+                <input id="id_name" type="text" name="name" required autocomplete="username">
+            </div>
+
+            <label for="id_email">Email</label>
+            <div class="input-with-icon">
+                <span class="input-icon"><svg class="icon"><use href="#icon-card"></use></svg></span>
+                <input id="id_email" type="email" name="email" required autocomplete="email">
+            </div>
+
+            <label for="id_password">Пароль</label>
+            <div class="input-with-icon">
+                <span class="input-icon"><svg class="icon"><use href="#icon-shield"></use></svg></span>
+                <input id="id_password" type="password" name="password" required autocomplete="new-password">
+            </div>
+
+            <label for="id_password_confirm">Подтверждение пароля</label>
+            <div class="input-with-icon">
+                <span class="input-icon"><svg class="icon"><use href="#icon-shield"></use></svg></span>
+                <input id="id_password_confirm" type="password" name="password_confirm" required autocomplete="new-password">
+            </div>
+
+            <button type="submit" class="btn btn-primary login-submit">Зарегистрироваться</button>
+        </form>
+        <p class="form-note">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+    </div>
+</div>
+{% endblock %}

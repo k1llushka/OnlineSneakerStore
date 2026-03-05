@@ -1,0 +1,43 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Мои заказы{% endblock %}
+
+{% block content %}
+<h1>Мои заказы</h1>
+
+{% if orders %}
+    <div class="orders-grid">
+        {% for order in orders %}
+            <article class="order-card">
+                <h3>Заказ №{{ order.id }}</h3>
+                <p><strong>Статус:</strong> {{ order.get_status_display }}</p>
+                <p><strong>Дата заказа:</strong> {{ order.created_at|date:"d.m.Y H:i" }}</p>
+                <p><strong>Адрес:</strong> {{ order.address }}</p>
+                <p><strong>Телефон:</strong> {{ order.phone }}</p>
+                <p class="order-hint">{{ order.delivery_hint }}</p>
+
+                <div class="order-items-mini">
+                    {% for item in order.items.all %}
+                        <div>{{ item.sneaker.name }} · {{ item.quantity }} шт. · размер {{ item.size|default:"—" }}</div>
+                    {% endfor %}
+                </div>
+
+                <p class="order-total">Итого: {{ order.total_amount }} ₽</p>
+
+                {% if order.can_cancel %}
+                    <form method="post" action="{% url 'cancel_order' order.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Отменить заказ ({{ order.cancel_minutes_left }} мин.)</button>
+                    </form>
+                {% elif order.status == 'delivered' %}
+                    <p class="muted">Заказ завершен.</p>
+                {% else %}
+                    <p class="muted">Отмена недоступна: прошло более 10 минут.</p>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>У вас пока нет заказов.</p>
+{% endif %}
+{% endblock %}

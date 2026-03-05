@@ -3,87 +3,54 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Панель управления{% endblock %}</title>
+    <link rel="icon" href="/static/img/logo.png" type="image/png">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body class="admin-body">
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
-    <symbol id="icon-sidebar-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 4h7v7H4zM13 4h7v4h-7zM13 11h7v9h-7zM4 14h7v6H4z"/>
-    </symbol>
-    <symbol id="icon-sidebar-orders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 4h16v16H4z"/>
-        <path d="M8 9h8M8 13h5"/>
-    </symbol>
-    <symbol id="icon-sidebar-products" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 7l8-4 8 4-8 4-8-4z"/>
-        <path d="M4 7v10l8 4 8-4V7"/>
-    </symbol>
-    <symbol id="icon-sidebar-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="9" r="3"/>
-        <circle cx="17" cy="9" r="3"/>
-        <path d="M4 20a4.5 4.5 0 0 1 9 0M13 20a4.5 4.5 0 0 1 7 0"/>
-    </symbol>
-    <symbol id="icon-sidebar-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1A1.7 1.7 0 0 0 9.9 3V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h.1a1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>
-    </symbol>
+    <symbol id="icon-sidebar-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7v7H4zM13 4h7v4h-7zM13 11h7v9h-7zM4 14h7v6H4z"/></symbol>
+    <symbol id="icon-sidebar-orders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/></symbol>
+    <symbol id="icon-sidebar-products" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l8-4 8 4-8 4-8-4z"/><path d="M4 7v10l8 4 8-4V7"/></symbol>
+    <symbol id="icon-sidebar-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="9" r="3"/><path d="M4 20a4.5 4.5 0 0 1 9 0M13 20a4.5 4.5 0 0 1 7 0"/></symbol>
+    <symbol id="icon-sidebar-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h.1A1.7 1.7 0 0 0 9.9 3V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h.1a1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v.1a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="icon-sidebar-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></symbol>
 </svg>
+
 <div class="admin-layout">
     <aside class="admin-sidebar">
         <div class="admin-sidebar__logo">
             <span class="logo-mark">S</span>
             <div>
                 <div class="logo-title">SneakerStore</div>
-                <div class="logo-subtitle">Панель клиента</div>
+                <div class="logo-subtitle">Admin Dashboard</div>
             </div>
         </div>
+
         <nav class="admin-sidebar__nav">
-            <a href="{% url 'dashboard' %}" class="admin-nav-link{% if request.resolver_match.url_name == 'dashboard' %} admin-nav-link--active{% endif %}">
-                <span class="admin-nav-icon">
-                    <svg class="icon"><use href="#icon-sidebar-dashboard"></use></svg>
-                </span>
-                <span>Dashboard</span>
-            </a>
-            <a href="{% url 'dashboard_orders' %}" class="admin-nav-link{% if request.resolver_match.url_name in 'dashboard_orders dashboard_order_detail' %} admin-nav-link--active{% endif %}">
-                <span class="admin-nav-icon">
-                    <svg class="icon"><use href="#icon-sidebar-orders"></use></svg>
-                </span>
-                <span>Заказы</span>
-            </a>
-            <a href="{% url 'dashboard_products' %}" class="admin-nav-link{% if request.resolver_match.url_name == 'dashboard_products' %} admin-nav-link--active{% endif %}">
-                <span class="admin-nav-icon">
-                    <svg class="icon"><use href="#icon-sidebar-products"></use></svg>
-                </span>
-                <span>Товары</span>
-            </a>
-            <a href="#" class="admin-nav-link">
-                <span class="admin-nav-icon">
-                    <svg class="icon"><use href="#icon-sidebar-users"></use></svg>
-                </span>
-                <span>Клиенты</span>
-            </a>
-            <a href="#" class="admin-nav-link">
-                <span class="admin-nav-icon">
-                    <svg class="icon"><use href="#icon-sidebar-settings"></use></svg>
-                </span>
-                <span>Настройки</span>
-            </a>
+            <a href="{% url 'dashboard' %}" class="admin-nav-link{% if request.resolver_match.url_name == 'dashboard' or request.resolver_match.url_name == 'admin_dashboard' %} admin-nav-link--active{% endif %}"><span class="admin-nav-icon"><svg class="icon"><use href="#icon-sidebar-dashboard"></use></svg></span><span>Dashboard</span></a>
+            <a href="{% url 'dashboard_orders' %}" class="admin-nav-link{% if request.resolver_match.url_name == 'dashboard_orders' or request.resolver_match.url_name == 'dashboard_order_detail' or request.resolver_match.url_name == 'admin_dashboard_orders' %} admin-nav-link--active{% endif %}"><span class="admin-nav-icon"><svg class="icon"><use href="#icon-sidebar-orders"></use></svg></span><span>Заказы</span></a>
+            <a href="{% url 'dashboard_products' %}" class="admin-nav-link{% if request.resolver_match.url_name == 'dashboard_products' %} admin-nav-link--active{% endif %}"><span class="admin-nav-icon"><svg class="icon"><use href="#icon-sidebar-products"></use></svg></span><span>Товары</span></a>
+            <a href="{% url 'dashboard_users' %}" class="admin-nav-link{% if request.resolver_match.url_name == 'dashboard_users' or request.resolver_match.url_name == 'admin_dashboard_users' %} admin-nav-link--active{% endif %}"><span class="admin-nav-icon"><svg class="icon"><use href="#icon-sidebar-users"></use></svg></span><span>Пользователи</span></a>
+            <a href="{% url 'account' %}" class="admin-nav-link"><span class="admin-nav-icon"><svg class="icon"><use href="#icon-sidebar-settings"></use></svg></span><span>Настройки</span></a>
+            <a href="{% url 'home' %}" class="admin-nav-link"><span class="admin-nav-icon"><svg class="icon"><use href="#icon-sidebar-users"></use></svg></span><span>Витрина</span></a>
+            <a href="{% url 'logout' %}" class="admin-nav-link"><span class="admin-nav-icon"><svg class="icon"><use href="#icon-sidebar-logout"></use></svg></span><span>Выйти</span></a>
         </nav>
     </aside>
+
     <div class="admin-main">
         <header class="admin-topbar">
-            <div class="admin-topbar__title">
-                {% block admin_page_title %}{% endblock %}
-            </div>
+            <div class="admin-topbar__title">{% block admin_page_title %}{% endblock %}</div>
             <div class="admin-topbar__profile">
-                <div class="admin-avatar">CL</div>
+                <div class="admin-avatar">{{ request.user.username|slice:":2"|upper }}</div>
                 <div class="admin-profile-text">
-                    <div class="admin-profile-name">Клиент</div>
-                    <div class="admin-profile-role">Админ-панель</div>
+                    <div class="admin-profile-name">{{ request.user.username }}</div>
+                    <div class="admin-profile-role">Администратор</div>
                 </div>
             </div>
         </header>
+
         <main class="admin-content">
             {% block content %}{% endblock %}
         </main>

@@ -1,4 +1,6 @@
-from .models import Sneaker
+﻿from django.db.utils import OperationalError, ProgrammingError
+
+from .models import Sneaker, UserProfile
 
 
 def cart(request):
@@ -9,5 +11,16 @@ def cart(request):
         sneaker = Sneaker.objects.filter(id=sneaker_id).first()
         if sneaker:
             total_price += sneaker.price * data["quantity"]
-    return {"cart_items_count": total_items, "cart_total_price": total_price}
 
+    user_profile = None
+    if request.user.is_authenticated:
+        try:
+            user_profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        except (OperationalError, ProgrammingError):
+            user_profile = None
+
+    return {
+        "cart_items_count": total_items,
+        "cart_total_price": total_price,
+        "user_profile": user_profile,
+    }

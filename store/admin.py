@@ -1,6 +1,6 @@
-from django.contrib import admin
+﻿from django.contrib import admin
 
-from .models import Sneaker, Order, OrderItem
+from .models import Order, OrderItem, Sneaker, UserProfile
 
 
 @admin.register(Sneaker)
@@ -18,3 +18,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ("id", "customer_name", "phone", "created_at")
     inlines = [OrderItemInline]
 
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ("user",)

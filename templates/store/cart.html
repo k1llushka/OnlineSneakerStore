@@ -1,4 +1,5 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
+{% load static %}
 
 {% block title %}Корзина{% endblock %}
 
@@ -6,39 +7,135 @@
 <h1>Корзина</h1>
 
 {% if items %}
-    <table class="cart-table">
+<form id="js-csrf-form" style="display:none;">{% csrf_token %}</form>
+
+<div class="cart-wrap">
+    <table class="cart-table" id="cart-table">
         <thead>
         <tr>
             <th>Товар</th>
             <th>Размер</th>
             <th>Количество</th>
             <th>Сумма</th>
-            <th></th>
+            <th>Действие</th>
         </tr>
         </thead>
         <tbody>
         {% for item in items %}
-            <tr>
-                <td>{{ item.sneaker.name }}</td>
-                <td>{{ item.size }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>{{ item.item_total }} ₽</td>
+            <tr data-sneaker-id="{{ item.sneaker.pk }}" data-unit-price="{{ item.unit_price }}">
                 <td>
-                    <form action="{% url 'remove_from_cart' item.sneaker.pk %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-secondary">Удалить</button>
-                    </form>
+                    <div class="cart-product">
+                        {% if item.sneaker.main_image %}
+                            <img src="{{ item.sneaker.main_image.url }}" alt="{{ item.sneaker.name }}" class="cart-product__img">
+                        {% else %}
+                            <img src="{% static 'img/placeholder.png' %}" alt="{{ item.sneaker.name }}" class="cart-product__img">
+                        {% endif %}
+                        <div>
+                            <div class="cart-product__name">{{ item.sneaker.name }}</div>
+                            <a href="{% url 'sneaker_detail' item.sneaker.pk %}" class="cart-product__link">Открыть товар</a>
+                        </div>
+                    </div>
+                </td>
+                <td>{{ item.size|default:"—" }}</td>
+                <td>
+                    <div class="qty-control">
+                        <button type="button" class="qty-btn js-qty-dec">−</button>
+                        <input type="number" min="1" value="{{ item.quantity }}" class="qty-input js-qty-input">
+                        <button type="button" class="qty-btn js-qty-inc">+</button>
+                    </div>
+                </td>
+                <td class="js-item-total">{{ item.item_total }} ₽</td>
+                <td>
+                    <button type="button" class="btn btn-danger js-remove-item">Удалить</button>
                 </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-    <div class="cart-summary">
-        <p>Итого: <strong>{{ total }} ₽</strong></p>
-        <a href="{% url 'checkout' %}" class="btn btn-primary">Оформить заказ</a>
-    </div>
-{% else %}
-    <p>Корзина пуста.</p>
-{% endif %}
-{% endblock %}
+</div>
 
+<div class="cart-summary">
+    <p>Итого: <strong id="js-cart-total">{{ total }} ₽</strong></p>
+    <a href="{% url 'checkout' %}" class="btn btn-primary">Оформить заказ</a>
+</div>
+{% else %}
+<p>Корзина пуста.</p>
+{% endif %}
+
+<script>
+(function () {
+    function postForm(url, data) {
+        return fetch(url, {
+            method: 'POST',
+            body: data,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(function (r) { return r.json(); });
+    }
+
+    function csrfToken() {
+        var el = document.querySelector('#js-csrf-form input[name="csrfmiddlewaretoken"]');
+        return el ? el.value : '';
+    }
+
+    function formatMoney(val) {
+        return Number(val).toFixed(2) + ' ₽';
+    }
+
+    var table = document.getElementById('cart-table');
+    if (!table) return;
+
+    table.querySelectorAll('tbody tr').forEach(function (row) {
+        var id = row.dataset.sneakerId;
+        var input = row.querySelector('.js-qty-input');
+        var dec = row.querySelector('.js-qty-dec');
+        var inc = row.querySelector('.js-qty-inc');
+        var remove = row.querySelector('.js-remove-item');
+        var totalCell = row.querySelector('.js-item-total');
+
+        function syncQty(qty) {
+            var form = new FormData();
+            form.append('csrfmiddlewaretoken', csrfToken());
+            form.append('quantity', qty);
+            postForm('/cart/update/' + id + '/', form).then(function (data) {
+                if (!data.ok) return;
+                input.value = data.quantity;
+                totalCell.textContent = formatMoney(data.item_total);
+                var cartTotal = document.getElementById('js-cart-total');
+                if (cartTotal) cartTotal.textContent = formatMoney(data.cart_total);
+                var badge = document.getElementById('js-cart-count');
+                if (badge) badge.textContent = String(data.cart_items_count);
+            });
+        }
+
+        dec.addEventListener('click', function () {
+            var next = Math.max(1, parseInt(input.value || '1', 10) - 1);
+            syncQty(next);
+        });
+        inc.addEventListener('click', function () {
+            var next = Math.max(1, parseInt(input.value || '1', 10) + 1);
+            syncQty(next);
+        });
+        input.addEventListener('change', function () {
+            var next = Math.max(1, parseInt(input.value || '1', 10));
+            syncQty(next);
+        });
+
+        remove.addEventListener('click', function () {
+            var form = new FormData();
+            form.append('csrfmiddlewaretoken', csrfToken());
+            postForm('/cart/remove/' + id + '/', form).then(function (data) {
+                if (!data.ok) return;
+                row.remove();
+                var cartTotal = document.getElementById('js-cart-total');
+                if (cartTotal) cartTotal.textContent = formatMoney(data.cart_total);
+                var badge = document.getElementById('js-cart-count');
+                if (badge) badge.textContent = String(data.cart_items_count);
+                if (!table.querySelector('tbody tr')) {
+                    window.location.reload();
+                }
+            });
+        });
+    });
+})();
+</script>
+{% endblock %}
