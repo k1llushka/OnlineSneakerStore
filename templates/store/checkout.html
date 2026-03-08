@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Оформление заказа{% endblock %}
 
@@ -9,7 +9,7 @@
     <p class="error">{{ error }}</p>
 {% endif %}
 
-<form method="post" class="form">
+<form method="post" class="form checkout-form">
     {% csrf_token %}
     <label>Имя</label>
     <input type="text" name="name" required>

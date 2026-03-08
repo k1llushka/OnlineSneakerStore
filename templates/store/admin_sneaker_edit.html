@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 {% load static %}
 
 {% block title %}Редактировать фото — {{ sneaker.name }}{% endblock %}
@@ -11,23 +11,23 @@
 
     <label>Главное фото</label>
     {% if sneaker.main_image %}
-        <p><img src="{{ sneaker.main_image.url }}" alt="" class="product-main-image" style="max-width:200px;"></p>
+        <p><img src="{{ sneaker.main_image.url }}" alt="" class="product-main-image" style="max-width: 220px;"></p>
     {% endif %}
     <input type="file" name="main_image" accept="image/*">
 
     <label>Дополнительное фото 1</label>
     {% if sneaker.additional_image_1 %}
-        <p><img src="{{ sneaker.additional_image_1.url }}" alt="" class="product-main-image" style="max-width:200px;"></p>
+        <p><img src="{{ sneaker.additional_image_1.url }}" alt="" class="product-main-image" style="max-width: 220px;"></p>
     {% endif %}
     <input type="file" name="additional_image_1" accept="image/*">
 
     <label>Дополнительное фото 2</label>
     {% if sneaker.additional_image_2 %}
-        <p><img src="{{ sneaker.additional_image_2.url }}" alt="" class="product-main-image" style="max-width:200px;"></p>
+        <p><img src="{{ sneaker.additional_image_2.url }}" alt="" class="product-main-image" style="max-width: 220px;"></p>
     {% endif %}
     <input type="file" name="additional_image_2" accept="image/*">
 
-    <div style="display:flex;gap:10px;">
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button type="submit" class="btn btn-primary">Сохранить</button>
         <a href="{% url 'admin_simple' %}" class="btn">Назад</a>
     </div>

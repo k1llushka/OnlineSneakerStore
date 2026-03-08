@@ -8,7 +8,7 @@
     <div class="admin-section__header">
         <h2>Добавить товар</h2>
     </div>
-    <form method="post" enctype="multipart/form-data" class="form">
+    <form method="post" enctype="multipart/form-data" class="form admin-product-form">
         {% csrf_token %}
         <input type="hidden" name="action" value="create">
 
@@ -97,3 +97,4 @@
     </div>
 </section>
 {% endblock %}
+

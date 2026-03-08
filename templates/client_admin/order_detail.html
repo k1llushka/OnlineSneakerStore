@@ -5,9 +5,9 @@
 
 {% block content %}
 <section class="admin-section">
-    <div class="admin-section__header">
+    <div class="admin-section__header admin-section__header--order">
         <h2>Информация о заказе</h2>
-        <form method="post" style="display:flex; gap:8px; align-items:center;">
+        <form method="post" class="admin-order-status-form">
             {% csrf_token %}
             <select name="status" class="admin-input">
                 {% for value, label in order.STATUS_CHOICES %}
@@ -47,14 +47,13 @@
         </div>
     </div>
 
-    <form method="post" onsubmit="return confirm('Удалить этот заказ? Действие необратимо.');">
-        {% csrf_token %}
-        <input type="hidden" name="delete" value="1">
-        <button type="submit" class="btn btn-secondary">Удалить заказ</button>
-    </form>
-
-    <p style="margin-top: 16px;">
-        <a href="{% url 'dashboard_orders' %}">← Назад к списку заказов</a>
-    </p>
+    <div class="admin-order-actions-row">
+        <form method="post" onsubmit="return confirm('Удалить этот заказ? Действие необратимо.');">
+            {% csrf_token %}
+            <input type="hidden" name="delete" value="1">
+            <button type="submit" class="btn btn-danger">Удалить заказ</button>
+        </form>
+        <a href="{% url 'dashboard_orders' %}" class="btn btn-secondary">← Назад к списку заказов</a>
+    </div>
 </section>
 {% endblock %}

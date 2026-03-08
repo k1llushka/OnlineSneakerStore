@@ -72,6 +72,32 @@ class OrderItem(models.Model):
         return self.quantity * self.sneaker.price
 
 
+
+class Cart(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="cart",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Корзина {self.user.username}"
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
+    sneaker = models.ForeignKey(Sneaker, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    size = models.CharField(max_length=10, blank=True)
+
+    class Meta:
+        unique_together = ("cart", "sneaker")
+
+    @property
+    def subtotal(self):
+        return self.quantity * self.sneaker.price
+
 class UserProfile(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -101,3 +127,4 @@ def save_user_profile(sender, instance, **kwargs):
     except (OperationalError, ProgrammingError):
         # UserProfile table may not exist until migrations are applied.
         return
+

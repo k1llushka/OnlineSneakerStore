@@ -1,4 +1,4 @@
-from datetime import timedelta
+﻿from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth import (
@@ -16,7 +16,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .models import Order, OrderItem, Sneaker
+from .models import Cart, CartItem, Order, OrderItem, Sneaker
 
 User = get_user_model()
 
@@ -56,6 +56,18 @@ def _cart_totals(cart):
     return total_items, total_price
 
 
+def _get_or_create_user_cart(user):
+    cart, _ = Cart.objects.get_or_create(user=user)
+    return cart
+
+
+def _user_cart_totals(user):
+    cart = _get_or_create_user_cart(user)
+    total_items = sum(item.quantity for item in cart.items.select_related("sneaker"))
+    total_price = sum(item.subtotal for item in cart.items.select_related("sneaker"))
+    return total_items, total_price
+
+
 def home(request):
     sneakers = Sneaker.objects.all()
     for sneaker in sneakers:
@@ -80,43 +92,76 @@ def sneaker_detail(request, pk):
 
 
 def cart_view(request):
-    cart = _get_cart(request.session)
     items = []
     total = 0
-    for sneaker_id, data in cart.items():
-        sneaker = Sneaker.objects.filter(id=sneaker_id).first()
-        if not sneaker:
-            continue
-        item_total = sneaker.price * data["quantity"]
-        total += item_total
-        items.append(
-            {
-                "sneaker": sneaker,
-                "quantity": data["quantity"],
-                "size": data.get("size") or "",
-                "item_total": item_total,
-                "unit_price": sneaker.price,
-            }
-        )
+
+    if request.user.is_authenticated:
+        cart = _get_or_create_user_cart(request.user)
+        for cart_item in cart.items.select_related("sneaker"):
+            sneaker = cart_item.sneaker
+            item_total = sneaker.price * cart_item.quantity
+            total += item_total
+            items.append(
+                {
+                    "sneaker": sneaker,
+                    "quantity": cart_item.quantity,
+                    "size": cart_item.size or "",
+                    "item_total": item_total,
+                    "unit_price": sneaker.price,
+                }
+            )
+    else:
+        cart = _get_cart(request.session)
+        for sneaker_id, data in cart.items():
+            sneaker = Sneaker.objects.filter(id=sneaker_id).first()
+            if not sneaker:
+                continue
+            item_total = sneaker.price * data["quantity"]
+            total += item_total
+            items.append(
+                {
+                    "sneaker": sneaker,
+                    "quantity": data["quantity"],
+                    "size": data.get("size") or "",
+                    "item_total": item_total,
+                    "unit_price": sneaker.price,
+                }
+            )
+
     return render(request, "store/cart.html", {"items": items, "total": total})
 
 
 @require_POST
 def add_to_cart(request, pk):
     sneaker = get_object_or_404(Sneaker, pk=pk)
-    cart = _get_cart(request.session)
     size = request.POST.get("size", "")
-    key = str(sneaker.id)
-    if key not in cart:
-        cart[key] = {"quantity": 0, "size": size}
-    cart[key]["quantity"] += 1
-    if size:
-        cart[key]["size"] = size
-    _save_cart(request.session, cart)
+
+    if request.user.is_authenticated:
+        cart = _get_or_create_user_cart(request.user)
+        item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            sneaker=sneaker,
+            defaults={"quantity": 1, "size": size},
+        )
+        if not created:
+            item.quantity += 1
+            if size:
+                item.size = size
+            item.save(update_fields=["quantity", "size"])
+        total_items, _ = _user_cart_totals(request.user)
+    else:
+        cart = _get_cart(request.session)
+        key = str(sneaker.id)
+        if key not in cart:
+            cart[key] = {"quantity": 0, "size": size}
+        cart[key]["quantity"] += 1
+        if size:
+            cart[key]["size"] = size
+        _save_cart(request.session, cart)
+        total_items, _ = _cart_totals(cart)
 
     is_ajax = request.headers.get("x-requested-with") == "XMLHttpRequest"
     if is_ajax:
-        total_items, _ = _cart_totals(cart)
         return JsonResponse(
             {
                 "ok": True,
@@ -129,14 +174,19 @@ def add_to_cart(request, pk):
 
 @require_POST
 def remove_from_cart(request, pk):
-    cart = _get_cart(request.session)
-    key = str(pk)
-    if key in cart:
-        del cart[key]
-        _save_cart(request.session, cart)
+    if request.user.is_authenticated:
+        cart = _get_or_create_user_cart(request.user)
+        CartItem.objects.filter(cart=cart, sneaker_id=pk).delete()
+        total_items, total_price = _user_cart_totals(request.user)
+    else:
+        cart = _get_cart(request.session)
+        key = str(pk)
+        if key in cart:
+            del cart[key]
+            _save_cart(request.session, cart)
+        total_items, total_price = _cart_totals(cart)
 
     if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        total_items, total_price = _cart_totals(cart)
         return JsonResponse(
             {"ok": True, "cart_items_count": total_items, "cart_total": float(total_price)}
         )
@@ -145,23 +195,35 @@ def remove_from_cart(request, pk):
 
 @require_POST
 def update_cart_item(request, pk):
-    cart = _get_cart(request.session)
-    key = str(pk)
-    if key not in cart:
-        return JsonResponse({"ok": False, "error": "Р В Р’В Р вЂ™Р’В Р В Р Р‹Р РЋРІР‚С”Р В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРЎС›Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°Р В Р’В Р В Р вЂ№Р В Р’В Р Р†Р вЂљРЎв„ў Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В¦Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’Вµ Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В¦Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°Р В Р’В Р вЂ™Р’В Р В Р вЂ Р Р†Р вЂљРЎвЂєР Р†Р вЂљРІР‚СљР В Р’В Р вЂ™Р’В Р В РЎС›Р Р†Р вЂљР’ВР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’ВµР В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В¦ Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В  Р В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРЎСљР В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРЎС›Р В Р’В Р В Р вЂ№Р В Р’В Р Р†Р вЂљРЎв„ўР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В·Р В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљР’ВР В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В¦Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’Вµ."}, status=404)
-
     try:
         quantity = int(request.POST.get("quantity", "1"))
     except ValueError:
         quantity = 1
     quantity = max(1, quantity)
 
-    cart[key]["quantity"] = quantity
-    _save_cart(request.session, cart)
+    if request.user.is_authenticated:
+        cart = _get_or_create_user_cart(request.user)
+        item = CartItem.objects.filter(cart=cart, sneaker_id=pk).first()
+        if not item:
+            return JsonResponse({"ok": False, "error": "Товар не найден в корзине."}, status=404)
 
-    sneaker = Sneaker.objects.filter(id=pk).first()
-    item_total = float(sneaker.price * quantity) if sneaker else 0
-    total_items, total_price = _cart_totals(cart)
+        item.quantity = quantity
+        item.save(update_fields=["quantity"])
+
+        item_total = float(item.subtotal)
+        total_items, total_price = _user_cart_totals(request.user)
+    else:
+        cart = _get_cart(request.session)
+        key = str(pk)
+        if key not in cart:
+            return JsonResponse({"ok": False, "error": "Товар не найден в корзине."}, status=404)
+
+        cart[key]["quantity"] = quantity
+        _save_cart(request.session, cart)
+
+        sneaker = Sneaker.objects.filter(id=pk).first()
+        item_total = float(sneaker.price * quantity) if sneaker else 0
+        total_items, total_price = _cart_totals(cart)
 
     return JsonResponse(
         {
@@ -175,9 +237,15 @@ def update_cart_item(request, pk):
 
 
 def checkout(request):
-    cart = _get_cart(request.session)
-    if not cart:
-        return redirect("home")
+    if request.user.is_authenticated:
+        user_cart = _get_or_create_user_cart(request.user)
+        cart_items = list(user_cart.items.select_related("sneaker"))
+        if not cart_items:
+            return redirect("home")
+    else:
+        session_cart = _get_cart(request.session)
+        if not session_cart:
+            return redirect("home")
 
     if request.method == "POST":
         name = request.POST.get("name", "").strip()
@@ -188,7 +256,7 @@ def checkout(request):
             return render(
                 request,
                 "store/checkout.html",
-                {"error": "Р В Р’В Р вЂ™Р’В Р В Р Р‹Р РЋРЎСџР В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРЎС›Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В¶Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В»Р В Р’В Р В Р вЂ№Р В Р Р‹Р Р†Р вЂљРЎС™Р В Р’В Р вЂ™Р’В Р В Р вЂ Р Р†Р вЂљРЎвЂєР Р†Р вЂљРІР‚СљР В Р’В Р В Р вЂ№Р В Р’В Р РЋРІР‚СљР В Р’В Р В Р вЂ№Р В Р вЂ Р В РІР‚С™Р РЋРІвЂћСћР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°, Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В·Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В°Р В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРІР‚СњР В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРЎС›Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В»Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В¦Р В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљР’ВР В Р’В Р В Р вЂ№Р В Р вЂ Р В РІР‚С™Р РЋРІвЂћСћР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’Вµ Р В Р’В Р вЂ™Р’В Р В Р’В Р Р†Р вЂљР’В Р В Р’В Р В Р вЂ№Р В Р’В Р РЋРІР‚СљР В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’Вµ Р В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРІР‚СњР В Р’В Р вЂ™Р’В Р В Р Р‹Р Р†Р вЂљРЎС›Р В Р’В Р вЂ™Р’В Р В РІР‚в„ўР вЂ™Р’В»Р В Р’В Р В Р вЂ№Р В Р’В Р В Р РЏ."},
+                {"error": "Заполните все поля: имя, телефон и адрес."},
             )
 
         order = Order.objects.create(
@@ -198,25 +266,34 @@ def checkout(request):
             user=request.user if request.user.is_authenticated else None,
         )
 
-        for sneaker_id, data in cart.items():
-            sneaker = Sneaker.objects.filter(id=sneaker_id).first()
-            if not sneaker:
-                continue
-            OrderItem.objects.create(
-                order=order,
-                sneaker=sneaker,
-                quantity=data["quantity"],
-                size=data.get("size") or "",
-            )
+        if request.user.is_authenticated:
+            for item in cart_items:
+                OrderItem.objects.create(
+                    order=order,
+                    sneaker=item.sneaker,
+                    quantity=item.quantity,
+                    size=item.size or "",
+                )
+            user_cart.items.all().delete()
+        else:
+            for sneaker_id, data in session_cart.items():
+                sneaker = Sneaker.objects.filter(id=sneaker_id).first()
+                if not sneaker:
+                    continue
+                OrderItem.objects.create(
+                    order=order,
+                    sneaker=sneaker,
+                    quantity=data["quantity"],
+                    size=data.get("size") or "",
+                )
+            request.session["cart"] = {}
+            request.session.modified = True
 
         if request.user.is_authenticated:
             order_ids = _get_user_order_ids(request.session)
             if order.id not in order_ids:
                 order_ids.append(order.id)
                 _save_user_order_ids(request.session, order_ids)
-
-        request.session["cart"] = {}
-        request.session.modified = True
 
         return render(
             request,
@@ -282,38 +359,47 @@ def account_view(request):
     success = ""
 
     if request.method == "POST":
-        username = request.POST.get("username", "").strip()
-        first_name = request.POST.get("first_name", "").strip()
-        last_name = request.POST.get("last_name", "").strip()
-        email = request.POST.get("email", "").strip()
-        current_password = request.POST.get("current_password", "").strip()
-        password = request.POST.get("password", "").strip()
-        password_confirm = request.POST.get("password_confirm", "").strip()
+        mode = request.POST.get("mode", "profile").strip()
 
-        if not username:
-            error = "Логин не может быть пустым."
-        elif User.objects.filter(username=username).exclude(pk=request.user.pk).exists():
-            error = "Пользователь с таким логином уже существует."
-        elif email and User.objects.filter(email=email).exclude(pk=request.user.pk).exists():
-            error = "Пользователь с таким email уже существует."
-        elif password and not current_password:
-            error = "Введите текущий пароль для смены пароля."
-        elif password and not request.user.check_password(current_password):
-            error = "Текущий пароль указан неверно."
-        elif password and password != password_confirm:
-            error = "Новые пароли не совпадают."
+        if mode == "profile":
+            username = request.POST.get("username", request.user.username).strip()
+            first_name = request.POST.get("first_name", request.user.first_name).strip()
+            last_name = request.POST.get("last_name", request.user.last_name).strip()
+
+            if not username:
+                error = "Логин не может быть пустым."
+            elif User.objects.filter(username=username).exclude(pk=request.user.pk).exists():
+                error = "Пользователь с таким логином уже существует."
+            else:
+                request.user.username = username
+                request.user.first_name = first_name
+                request.user.last_name = last_name
+                request.user.save(update_fields=["username", "first_name", "last_name"])
+                success = "Профиль обновлен."
+
         else:
-            request.user.username = username
-            request.user.first_name = first_name
-            request.user.last_name = last_name
-            request.user.email = email
-            if password:
-                request.user.set_password(password)
-            request.user.save()
+            email = request.POST.get("email", request.user.email).strip()
+            current_password = request.POST.get("current_password", "").strip()
+            password = request.POST.get("password", "").strip()
+            password_confirm = request.POST.get("password_confirm", "").strip()
 
-            if password:
-                update_session_auth_hash(request, request.user)
-            success = "Профиль обновлен."
+            if email and User.objects.filter(email=email).exclude(pk=request.user.pk).exists():
+                error = "Пользователь с таким email уже существует."
+            elif password and not current_password:
+                error = "Введите текущий пароль для смены пароля."
+            elif password and not request.user.check_password(current_password):
+                error = "Текущий пароль указан неверно."
+            elif password and password != password_confirm:
+                error = "Новые пароли не совпадают."
+            else:
+                request.user.email = email
+                if password:
+                    request.user.set_password(password)
+                    request.user.save()
+                    update_session_auth_hash(request, request.user)
+                else:
+                    request.user.save(update_fields=["email"])
+                success = "Данные безопасности обновлены."
 
     return render(request, "store/account.html", {"error": error, "success": success})
 
@@ -400,6 +486,7 @@ def register_view(request):
 @login_required
 def logout_view(request):
     logout(request)
+    request.session.flush()
     return redirect("home")
 
 
@@ -585,4 +672,11 @@ def dashboard_users(request):
     users.sort(key=lambda row: row["last_order_at"], reverse=True)
 
     return render(request, "client_admin/users.html", {"users": users})
+
+
+
+
+
+
+
 

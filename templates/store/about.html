@@ -1,5 +1,4 @@
-{% extends "base.html" %}
-{% load static %}
+﻿{% extends "base.html" %}
 
 {% block title %}О магазине — SneakerStore{% endblock %}
 
@@ -7,61 +6,55 @@
 <section class="about-hero fade-in-up">
     <div class="about-hero-text">
         <h1>О SneakerStore</h1>
-        <p>Учебный интернет-магазин кроссовок с акцентом на чистую архитектуру, современный UI и понятный пользовательский опыт.</p>
+        <p>Современный магазин кроссовок в минималистичном dark-стиле. Мы сфокусированы на быстром выборе, удобной корзине и понятном оформлении заказа.</p>
     </div>
 </section>
 
 <section class="about-section fade-in-up">
-    <h2>О магазине</h2>
-    <p class="about-lead">Проект создан как учебная площадка для практики Django и современного frontend. Здесь реализованы основные модули e-commerce: каталог, карточка товара, корзина, оформление заказа и панель управления.</p>
-</section>
-
-<section class="about-section fade-in-up">
-    <h2>Преимущества</h2>
+    <h2>Почему нас выбирают</h2>
     <div class="features-grid features-grid--about">
-        <article class="feature-card feature-card--ux">
+        <article class="feature-card">
             <div class="feature-icon"><svg class="icon"><use href="#icon-target"></use></svg></div>
-            <h3>Фокус на UX</h3>
-            <p>Минималистичный интерфейс с акцентом на ключевые действия пользователя.</p>
+            <h3>Чистый UX</h3>
+            <p>Простая навигация, контрастные элементы и логичные сценарии покупки без лишних шагов.</p>
         </article>
-        <article class="feature-card feature-card--arch">
+        <article class="feature-card">
             <div class="feature-icon"><svg class="icon"><use href="#icon-card"></use></svg></div>
-            <h3>Прозрачная архитектура</h3>
-            <p>Разделение слоев: модели, views, шаблоны и интерфейс админ-панели.</p>
+            <h3>Быстрое оформление</h3>
+            <p>Добавление в корзину без перезагрузки страницы и удобное оформление заказа за пару кликов.</p>
         </article>
-        <article class="feature-card feature-card--ext">
+        <article class="feature-card">
             <div class="feature-icon"><svg class="icon"><use href="#icon-box"></use></svg></div>
-            <h3>Расширяемость</h3>
-            <p>Проект легко дополнять новыми интеграциями и бизнес-логикой.</p>
+            <h3>Масштабируемость</h3>
+            <p>Интерфейс и структура готовы к расширению каталога, интеграциям и росту проекта.</p>
         </article>
     </div>
 </section>
 
 <section class="about-section fade-in-up">
-    <h2>Отзывы</h2>
+    <h2>Отзывы клиентов</h2>
     <div class="reviews-grid">
         <article class="review-card">
-            <p>Заказывал себе и сыну — пришли за 3 дня, упаковано норм. Размер попал, на ноге сидят отлично. Цена адекватная.</p>
+            <p>Заказ пришел быстро, качество отличное, размер подошел идеально. Оформление сайта очень удобное.</p>
             <div class="review-meta">
                 <span class="review-author">Дмитрий К.</span>
                 <span class="review-date">2 дня назад</span>
             </div>
         </article>
         <article class="review-card">
-            <p>Долго выбирала между двумя моделями, в итоге взяла эти. Не пожалела — носятся удобно, с джинсами и спортивкой ок. Сайт простой, оформила заказ без геморроя.</p>
+            <p>Понравился минималистичный интерфейс и понятная корзина. Заказ оформила без сложностей.</p>
             <div class="review-meta">
-                <span class="review-author">Марина, Екб</span>
+                <span class="review-author">Марина С.</span>
                 <span class="review-date">неделю назад</span>
             </div>
         </article>
         <article class="review-card">
-            <p>Первый раз заказывал здесь. Доставка быстрая, курьер позвонил заранее. Кроссовки как на фото, качество устроило. Буду рекомендовать.</p>
+            <p>Кроссовки полностью соответствуют фото, доставка в срок. Буду заказывать еще.</p>
             <div class="review-meta">
-                <span class="review-author">Андрей</span>
+                <span class="review-author">Андрей П.</span>
                 <span class="review-date">5 дней назад</span>
             </div>
         </article>
     </div>
 </section>
 {% endblock %}
-

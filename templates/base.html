@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Sneaker Store{% endblock %}</title>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="/static/img/logo.png?v=2">
     <link rel="shortcut icon" type="image/png" href="/static/img/logo.png?v=2">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
@@ -45,19 +47,33 @@
             </a>
 
             {% if request.user.is_authenticated %}
-                                {% if not request.user.is_staff and not request.user.is_superuser %}
-                    <a href="{% url 'my_orders' %}" class="nav-profile">Мои заказы</a>
-                {% endif %}
                 {% if request.user.is_staff or request.user.is_superuser %}
                     <a href="{% url 'dashboard_products' %}" class="nav-profile">Добавить товар</a>
+                {% else %}
+                    <a href="{% url 'my_orders' %}" class="nav-profile">Мои заказы</a>
                 {% endif %}
-                <a href="{% url 'account' %}" class="nav-user nav-user--link">
-                    <span>{{ request.user.username }}</span>
-                </a>
-                <a href="{% url 'logout' %}" class="nav-profile">
-                    <span class="nav-icon"><svg class="icon"><use href="#icon-logout"></use></svg></span>
-                    <span>Выйти</span>
-                </a>
+                <div class="nav-account">
+                    <button type="button" class="nav-account__trigger">
+                        <span>{{ request.user.username }}</span>
+                        <span>▼</span>
+                    </button>
+                    <div class="nav-account__menu">
+                        <a href="{% url 'account' %}">
+                            <svg class="icon"><use href="#icon-user"></use></svg>
+                            <span>Мой профиль</span>
+                        </a>
+                        {% if not request.user.is_staff and not request.user.is_superuser %}
+                            <a href="{% url 'my_orders' %}">
+                                <svg class="icon"><use href="#icon-card"></use></svg>
+                                <span>Мои заказы</span>
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}">
+                            <svg class="icon"><use href="#icon-logout"></use></svg>
+                            <span>Выйти</span>
+                        </a>
+                    </div>
+                </div>
             {% else %}
                 <a href="{% url 'login' %}" class="nav-profile">
                     <span class="nav-icon"><svg class="icon"><use href="#icon-user"></use></svg></span>
@@ -127,12 +143,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
