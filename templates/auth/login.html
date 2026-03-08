@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Вход в аккаунт — SneakerStore{% endblock %}
 
@@ -10,7 +10,7 @@
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
-        <p id="js-login-hint" class="validation-hint" style="display:none;"></p>
+
         <form method="post" class="login-form" id="js-login-form" novalidate>
             {% csrf_token %}
             <label for="id_username">Логин</label>
@@ -30,33 +30,4 @@
         <p class="form-note">Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p>
     </div>
 </div>
-<script>
-(function() {
-    var form = document.getElementById('js-login-form');
-    var hint = document.getElementById('js-login-hint');
-    var username = document.getElementById('id_username');
-    var password = form.querySelector('input[name="password"]');
-    form.addEventListener('submit', function(e) {
-        var u = username.value.trim();
-        var p = password.value;
-        hint.style.display = 'none';
-        if (!u && !p) {
-            hint.textContent = 'Введите логин и пароль.';
-            hint.style.display = 'block';
-            e.preventDefault();
-            username.focus();
-        } else if (!u) {
-            hint.textContent = 'Заполните поле «Логин».';
-            hint.style.display = 'block';
-            e.preventDefault();
-            username.focus();
-        } else if (!p) {
-            hint.textContent = 'Заполните поле «Пароль».';
-            hint.style.display = 'block';
-            e.preventDefault();
-            password.focus();
-        }
-    });
-})();
-</script>
 {% endblock %}

@@ -1745,3 +1745,56 @@ a.btn-ghost {
 .review-date {
     color: #64748b;
 }
+.admin-avatar--img {
+    object-fit: cover;
+    border-radius: 999px;
+}
+.avatar-upload-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.avatar-upload-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.avatar-input {
+    position: absolute;
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+    overflow: hidden;
+}
+
+.avatar-picker-btn {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-file-name {
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.profile-avatar-preview--fallback {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 22px;
+    color: #ecfeff;
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.55), rgba(14, 165, 233, 0.5));
+}
+
+@media (max-width: 640px) {
+    .avatar-upload-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

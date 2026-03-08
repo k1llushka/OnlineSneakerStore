@@ -52,11 +52,6 @@
                     <a href="{% url 'dashboard_products' %}" class="nav-profile">Добавить товар</a>
                 {% endif %}
                 <a href="{% url 'account' %}" class="nav-user nav-user--link">
-                    {% if user_profile and user_profile.avatar %}
-                        <img src="{{ user_profile.avatar.url }}" alt="{{ request.user.username }}" class="nav-avatar">
-                    {% else %}
-                        <span class="nav-avatar nav-avatar--fallback">{{ request.user.username|slice:":1"|upper }}</span>
-                    {% endif %}
                     <span>{{ request.user.username }}</span>
                 </a>
                 <a href="{% url 'logout' %}" class="nav-profile">
@@ -132,6 +127,11 @@
 </script>
 </body>
 </html>
+
+
+
+
+
 
 
 

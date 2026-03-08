@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
 {% block title %}Регистрация — SneakerStore{% endblock %}
 
@@ -10,9 +10,8 @@
         {% if error %}
             <p class="error">{{ error }}</p>
         {% endif %}
-        <p id="js-email-hint" class="form-hint form-hint--error" style="display:none;"></p>
 
-        <form method="post" class="login-form" id="js-register-form" novalidate>
+        <form method="post" class="login-form">
             {% csrf_token %}
             <label for="id_name">Имя</label>
             <div class="input-with-icon">
@@ -23,7 +22,7 @@
             <label for="id_email">Email</label>
             <div class="input-with-icon">
                 <span class="input-icon"><svg class="icon"><use href="#icon-card"></use></svg></span>
-                <input id="id_email" type="email" name="email" required autocomplete="email" placeholder="example@mail.ru">
+                <input id="id_email" type="email" name="email" required autocomplete="email">
             </div>
 
             <label for="id_password">Пароль</label>
@@ -31,10 +30,6 @@
                 <span class="input-icon"><svg class="icon"><use href="#icon-shield"></use></svg></span>
                 <input id="id_password" type="password" name="password" required autocomplete="new-password">
             </div>
-            <ul class="password-hints" id="js-password-hints">
-                <li id="js-hint-len">Минимум 8 символов</li>
-                <li id="js-hint-match">Пароли должны совпадать</li>
-            </ul>
 
             <label for="id_password_confirm">Подтверждение пароля</label>
             <div class="input-with-icon">
@@ -47,46 +42,4 @@
         <p class="form-note">Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
     </div>
 </div>
-<script>
-(function() {
-    var form = document.getElementById('js-register-form');
-    var emailInput = document.getElementById('id_email');
-    var emailHint = document.getElementById('js-email-hint');
-    var passwordInput = document.getElementById('id_password');
-    var passwordConfirm = document.getElementById('id_password_confirm');
-    var hintLen = document.getElementById('js-hint-len');
-    var hintMatch = document.getElementById('js-hint-match');
-
-    function checkEmail() {
-        var v = emailInput.value.trim();
-        if (!v) { emailHint.style.display = 'none'; return true; }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
-            emailHint.textContent = 'Введите корректный email, например example@mail.ru';
-            emailHint.style.display = 'block';
-            return false;
-        }
-        emailHint.style.display = 'none';
-        return true;
-    }
-
-    function checkPasswordHints() {
-        var p = passwordInput.value;
-        var c = passwordConfirm.value;
-        hintLen.classList.toggle('valid', p.length >= 8);
-        hintMatch.classList.toggle('valid', c.length > 0 && p === c);
-    }
-
-    emailInput.addEventListener('blur', checkEmail);
-    emailInput.addEventListener('input', function() { emailHint.style.display = 'none'; });
-    passwordInput.addEventListener('input', checkPasswordHints);
-    passwordConfirm.addEventListener('input', checkPasswordHints);
-
-    form.addEventListener('submit', function(e) {
-        if (!checkEmail()) {
-            e.preventDefault();
-            emailInput.focus();
-        }
-    });
-})();
-</script>
 {% endblock %}
