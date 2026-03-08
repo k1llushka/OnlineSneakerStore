@@ -247,18 +247,18 @@ def my_orders(request):
         remaining = timedelta(minutes=10) - age
         order.cancel_minutes_left = max(0, int(remaining.total_seconds() // 60))
 
-        # Simple ETA model for storefront UX.
         if order.status == Order.STATUS_NEW:
             eta = order.created_at + timedelta(days=4)
-            order.delivery_hint = f"РћР¶РёРґР°РµРјР°СЏ РґРѕСЃС‚Р°РІРєР°: РґРѕ {eta:%d.%m.%Y}"
+            order.delivery_hint = f"Ожидаемая доставка: до {eta:%d.%m.%Y}"
         elif order.status == Order.STATUS_PROCESSING:
             eta = order.created_at + timedelta(days=3)
-            order.delivery_hint = f"Р—Р°РєР°Р· РІ РѕР±СЂР°Р±РѕС‚РєРµ. РћР¶РёРґР°РµРјР°СЏ РґРѕСЃС‚Р°РІРєР°: РґРѕ {eta:%d.%m.%Y}"
+            order.delivery_hint = f"Заказ в обработке. Ожидаемая доставка: до {eta:%d.%m.%Y}"
         elif order.status == Order.STATUS_SHIPPED:
             eta = order.created_at + timedelta(days=2)
-            order.delivery_hint = f"Р—Р°РєР°Р· РІ РїСѓС‚Рё. РћР¶РёРґР°РµРјР°СЏ РґРѕСЃС‚Р°РІРєР°: РґРѕ {eta:%d.%m.%Y}"
+            order.delivery_hint = f"Заказ в пути. Ожидаемая доставка: до {eta:%d.%m.%Y}"
         else:
-            order.delivery_hint = "РўРѕРІР°СЂ Р·Р°Р±СЂР°Р»Рё, Р·Р°РєР°Р· Р·Р°РІРµСЂС€РµРЅ."
+            order.delivery_hint = "Товар забрали, заказ завершен."
+
     return render(request, "store/my_orders.html", {"orders": orders})
 
 
@@ -315,17 +315,11 @@ def account_view(request):
                 update_session_auth_hash(request, request.user)
             success = "Профиль обновлен."
 
-    return render(
-        request,
-        "store/account.html",
-        {"error": error, "success": success},
-    )
-
+    return render(request, "store/account.html", {"error": error, "success": success})
 
 
 @user_passes_test(_is_admin, login_url="login")
 def admin_simple(request):
-    # Legacy route: keep compatibility and reuse products dashboard.
     return dashboard_products(request)
 
 
@@ -355,6 +349,7 @@ def admin_sneaker_delete(request, pk):
     Sneaker.objects.filter(pk=pk).delete()
     return redirect(request.POST.get("next") or reverse("admin_simple"))
 
+
 def login_view(request):
     if request.user.is_authenticated:
         if _is_admin(request.user):
@@ -371,7 +366,7 @@ def login_view(request):
             if _is_admin(user):
                 return redirect("dashboard")
             return redirect("home")
-        error = "РќРµРІРµСЂРЅС‹Р№ Р»РѕРіРёРЅ РёР»Рё РїР°СЂРѕР»СЊ."
+        error = "Неверный логин или пароль."
     return render(request, "auth/login.html", {"error": error})
 
 
@@ -387,23 +382,21 @@ def register_view(request):
         password_confirm = request.POST.get("password_confirm", "").strip()
 
         if not (name and email and password and password_confirm):
-            error = "Р—Р°РїРѕР»РЅРёС‚Рµ РІСЃРµ РїРѕР»СЏ."
+            error = "Заполните все поля."
         elif password != password_confirm:
-            error = "РџР°СЂРѕР»Рё РЅРµ СЃРѕРІРїР°РґР°СЋС‚."
+            error = "Пароли не совпадают."
         elif User.objects.filter(username=name).exists():
-            error = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚."
+            error = "Пользователь с таким именем уже существует."
         elif User.objects.filter(email=email).exists():
-            error = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ С‚Р°РєРёРј email СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚."
+            error = "Пользователь с таким email уже существует."
         else:
-            user = User.objects.create_user(
-                username=name,
-                email=email,
-                password=password,
-            )
+            user = User.objects.create_user(username=name, email=email, password=password)
             login(request, user)
             return redirect("home")
 
     return render(request, "auth/register.html", {"error": error})
+
+
 @login_required
 def logout_view(request):
     logout(request)
